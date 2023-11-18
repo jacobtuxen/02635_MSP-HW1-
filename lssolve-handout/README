@@ -1,0 +1,9 @@
+Start by reading the writeup, `assignment.pdf`, which is available on Autolab.
+
+Use the templates `call_dgels.c` and `lssolve.c` for your implementation (refer to the problem description for details).
+
+To test your implementation of `call_dgels()`, use `make test1` to run a set of basic tests. 
+
+Similarly, to test your implementation of the `lssolve` program, run `make test2`.
+
+Submit your solution to Autolab when you are done testing your code. You can use `make lssolve-handin.tar` to create a tar file `lssolve-handin.tar` with the files `call_dgels.c` and `lssolve.c`.

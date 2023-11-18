@@ -1,0 +1,17 @@
+image: gcc:latest
+
+build:
+  stage: build
+  before_script:
+    - gcc --version
+  script:
+    - make 
+
+test:
+  stage: test
+  script:
+    - make test
+  artifacts:
+    paths:
+      - "tests/*.log"
+    expire_in: 2 week
