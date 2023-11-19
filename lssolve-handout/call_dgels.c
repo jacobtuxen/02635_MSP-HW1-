@@ -63,7 +63,6 @@ static inline int min(int a, int b) {
 
 int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 {
-	printf("doing stuff \n");
 	if (A == NULL || b == NULL) {
 		return -12;
 	}
@@ -75,9 +74,6 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 		return -13;
 	}
 	if (b->len != m) {
-		printf("m is %d \n", m);
-		printf("n is %d \n", n);
-		printf("b length: %zu \n", b->len);
 		return -14;
 	}
 
@@ -111,7 +107,6 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 		dgels_(&trans, &n, &m, &nrhs, A->val, &lda, b->val, &ldb, work_array, &lwork, &status_code);
 		free(work_array);
 		if (status_code != 0) {
-			printf("failed status code");
 			return status_code;
 		}
 	} else {
@@ -122,7 +117,6 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 		dgels_(&trans, &m, &n, &nrhs, A->val, &lda, b->val, &ldb, work_array, &lwork, &status_code);
 		free(work_array);
 		if (status_code != 0) {
-			printf("failed status code");
 			return status_code;
 		}
 	}
