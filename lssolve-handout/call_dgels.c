@@ -124,10 +124,18 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 	b->len = n;
 
 		if (resnorm != NULL) {
+			/* OLD:
 			array_t *residuals = array_alloc(b->capacity);
 			double *dummy = b->val + n;
 			memcpy(residuals->val, dummy, (m-n) * sizeof(double)); // this could be done better
 			residuals->len = m-n;
+			*/ 
+			// NEW:
+			array_t *residuals = array_alloc(b->capacity);
+			//double *dummy = b->val + n;
+			memcpy(residuals->val, &(b->val[n]), (m-n) * sizeof(double)); // this could be done better
+			residuals->len = m-n;
+			
 
 			*resnorm = ltwo_norm(residuals);
 			free(residuals);
