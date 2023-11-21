@@ -29,9 +29,10 @@ int main(int argc, char *argv[])
     return 1;
   }
   
-  
+  printf("Residual norm: %f\n", resnorm);
+  printf("Coefficient of determination: %f\n", rsquared);
+  // write x* to file
   array_to_file(argv[3], b);
-
 
   return EXIT_SUCCESS;
 }

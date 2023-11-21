@@ -95,6 +95,7 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 
 
 	if (!work_array) {
+				free(work_array);
         return -15;
     }
 
@@ -131,8 +132,8 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 			*resnorm = ltwo_norm(residuals);
 			free(residuals);
 		}
-		if (rsquared != NULL) {
-			*rsquared = 1 - (*resnorm * *resnorm) / *rsquared;
+		if (rsquared != NULL && resnorm != NULL) {
+			*rsquared = 1 - (*resnorm / *rsquared) * *resnorm;
 		}
 	return 0;
 }
