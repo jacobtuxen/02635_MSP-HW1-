@@ -81,7 +81,7 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 	}
 
 	if (rsquared != NULL) {
-		double mean = 0;
+		double mean = 0.0;
 		*rsquared = 0.0;
 			for (size_t i = 0; i < b->len; i++) {
 				mean += b->val[i]/b->len;
