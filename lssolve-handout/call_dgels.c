@@ -113,7 +113,7 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 		if (status_code != 0) {
 			return status_code;
 		}
-	} else {
+	} else if (A->order == ColMajor) {
 		char trans = 'N';
 		int status_code = 1;
 		int lda = m;
@@ -131,7 +131,13 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 			*resnorm = 0.0;
 			*resnorm = ltwo_norm(&b->val[n], len);
 		}
-		if (rsquared != NULL || resnorm != NULL) {
+		else if (rsquared != NULL) {
+			double place_holder = 0.0;
+			size_t len = m-n;
+			place_holder = ltwo_norm(&b->val[n], len);
+			*rsquared = 1.0 - (place_holder / *rsquared) * place_holder;
+		}
+		if (rsquared != NULL && resnorm != NULL) {
 			*rsquared = 1.0 - (*resnorm / *rsquared) * *resnorm;
 		}
 	return 0;
