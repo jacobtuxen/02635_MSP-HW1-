@@ -41,10 +41,6 @@ following exceptions: the return value is
 
 
 double ltwo_norm(double * val, size_t len) {
-    if (val == NULL) {
-        return -1;
-    }
-
     double sum = 0.0;
     for (size_t i = 0; i < len; i++) {
         sum += val[i] * val[i];
@@ -80,12 +76,14 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 		return -14;
 	}
 
+	//update rsquard with ||Cb||_2^2
 	if (rsquared != NULL) {
-		double mean = 0;
+		double mean = 0.0;
 		*rsquared = 0.0;
 			for (size_t i = 0; i < b->len; i++) {
-				mean += b->val[i]/b->len;
+				mean += b->val[i];
 			}
+			mean /= b->len;
 			for (size_t i = 0; i < b->len; i++) {
 				*rsquared += (b->val[i]-mean)*(b->val[i]-mean);
 			}
@@ -102,7 +100,17 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
         return -15;
     }
 
-	if (A->order == RowMajor) {
+	if (A->order == ColMajor) {
+		char trans = 'N';
+		int status_code = 1;
+		int lda = m;
+		int ldb = m;
+		dgels_(&trans, &m, &n, &nrhs, A->val, &lda, b->val, &ldb, work_array, &lwork, &status_code);
+		free(work_array);
+		if (status_code != 0) {
+			return status_code;
+		}
+	} else if (A->order == RowMajor) {
 		char trans = 'T';
 		int status_code = 1;
 		int lda = n;
@@ -113,32 +121,21 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 		if (status_code != 0) {
 			return status_code;
 		}
-	} else if (A->order == ColMajor) {
-		char trans = 'N';
-		int status_code = 1;
-		int lda = m;
-		int ldb = m;
-		dgels_(&trans, &m, &n, &nrhs, A->val, &lda, b->val, &ldb, work_array, &lwork, &status_code);
-		free(work_array);
-		if (status_code != 0) {
-			return status_code;
-		}
 	}
-	b->len = n;
 
-		if (resnorm != NULL) {
-			size_t len = m-n;
-			*resnorm = 0.0;
-			*resnorm = ltwo_norm(&b->val[n], len);
-		}
-		else if (rsquared != NULL) {
-			double place_holder = 0.0;
-			size_t len = m-n;
-			place_holder = ltwo_norm(&b->val[n], len);
-			*rsquared = 1.0 - (place_holder / *rsquared) * place_holder;
-		}
-		if (rsquared != NULL && resnorm != NULL) {
-			*rsquared = 1.0 - (*resnorm / *rsquared) * *resnorm;
-		}
+	if (resnorm != NULL) {
+		size_t len = m-n;
+		*resnorm = 0.0;
+		*resnorm = ltwo_norm(&b->val[n], len);
+	}
+
+	if (rsquared != NULL) {
+		double place_holder = 0.0; //Use placeholder instead, as resnorm can be null
+		size_t len = m-n;
+		place_holder = ltwo_norm(&b->val[n], len);
+		*rsquared = 1.0 - (place_holder / *rsquared) * place_holder;
+	}
+
+	b->len = n;
 	return 0;
 }
