@@ -16,6 +16,8 @@ int main(int argc, char *argv[])
   array2d_t *A = array2d_from_file(argv[1]);
   array_t *b = array_from_file(argv[2]);
   if (A == NULL || b == NULL || (A->shape[0] < A->shape[1])) {
+    array2d_dealloc(A);
+    array_dealloc(b);
     return EXIT_FAILURE;
   }
 
@@ -33,6 +35,8 @@ int main(int argc, char *argv[])
   printf("Coefficient of determination: %f\n", rsquared);
   // write x* to file
   array_to_file(argv[3], b);
+  array2d_dealloc(A);
+  array_dealloc(b);
 
   return EXIT_SUCCESS;
 }

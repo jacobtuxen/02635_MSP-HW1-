@@ -40,14 +40,14 @@ following exceptions: the return value is
 */
 
 
-double ltwo_norm(array_t *x) {
-    if (x == NULL || x->val == NULL) {
+double ltwo_norm(double * val, size_t len) {
+    if (val == NULL) {
         return -1;
     }
 
-    double sum = 0;
-    for (size_t i = 0; i < x->len; i++) {
-        sum += x->val[i] * x->val[i];
+    double sum = 0.0;
+    for (size_t i = 0; i < len; i++) {
+        sum += val[i] * val[i];
     }
     return sqrt(sum);
 }
@@ -66,6 +66,7 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 	if (A == NULL || b == NULL) {
 		return -12;
 	}
+
 	int m = A->shape[0];
 	int n = A->shape[1];
 	int nrhs = 1;
@@ -73,13 +74,15 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 	if (m < n) {
 		return -13;
 	}
+
+
 	if (b->len != m) {
 		return -14;
 	}
 
 	if (rsquared != NULL) {
 		double mean = 0;
-		*rsquared = 0;
+		*rsquared = 0.0;
 			for (size_t i = 0; i < b->len; i++) {
 				mean += b->val[i]/b->len;
 			}
@@ -124,24 +127,12 @@ int call_dgels(array2d_t * A, array_t * b, double * resnorm, double * rsquared)
 	b->len = n;
 
 		if (resnorm != NULL) {
-			/* OLD:
-			array_t *residuals = array_alloc(b->capacity);
-			double *dummy = b->val + n;
-			memcpy(residuals->val, dummy, (m-n) * sizeof(double)); // this could be done better
-			residuals->len = m-n;
-			*/ 
-			// NEW:
-			array_t *residuals = array_alloc(b->capacity);
-			//double *dummy = b->val + n;
-			memcpy(residuals->val, &(b->val[n]), (m-n) * sizeof(double)); // this could be done better
-			residuals->len = m-n;
-			
-
-			*resnorm = ltwo_norm(residuals);
-			free(residuals);
+			size_t len = m-n;
+			*resnorm = 0.0;
+			*resnorm = ltwo_norm(&b->val[n], len);
 		}
-		if (rsquared != NULL && resnorm != NULL) {
-			*rsquared = 1 - (*resnorm / *rsquared) * *resnorm;
+		if (rsquared != NULL || resnorm != NULL) {
+			*rsquared = 1.0 - (*resnorm / *rsquared) * *resnorm;
 		}
 	return 0;
 }
